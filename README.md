@@ -1,9 +1,17 @@
 # Logrex
 
-Logrex is an Elixir logging library inspired by [Logrus](https://github.com/sirupsen/logrus). Logrex makes it simple
-to display fields and values outside of the log text, for a cleaner output and
-easier parsing.
+Logrex is an Elixir logging formatter inspired by [Logrus](https://github.com/sirupsen/logrus). Logrex makes it simple
+to display dynamic fields outside of the inline text, for easier grokking and
+parsing.
 
+## To do
+
+* Add tests!
+* Add configurable standard metadata formatting
+* Add configurable level coloring
+* Use defaults based on mix environment if metadata format isn't provided
+
+## Usage
 Logrex differs from the standard Elixir console logger in that it doesn't
 require a whitelist of fields to be defined in order for those fields to be
 displayed. In that regard, it's essentially just a passthrough to a formatter.

@@ -21,9 +21,15 @@ use Mix.Config
 #     config :logger, level: :info
 #
 
-config :logger,
-  backends: [Logrex]
-  padding: 10
+#config :logger,
+#  backends: [{Logrex, :logrex_console}]
+
+#config :logger, :logrex_console,
+#  padding: 10
+
+config :logger, :console,
+  format: {Logrex.Console.Formatter, :format},
+  metadata: :all
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
