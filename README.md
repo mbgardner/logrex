@@ -1,4 +1,4 @@
-# Logrex <img src="https://imgur.com/a/miTk6" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
+# Logrex <img src="https://i.imgur.com/UEbtVhA.jpg" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
 
 `Logrex` is an Elixir logging formatter inspired by [Logrus](https://github.com/sirupsen/logrus).
 `Logrex` makes it simple to display dynamic fields outside of the inline text, for easier grokking and
