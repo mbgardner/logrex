@@ -35,16 +35,19 @@ config :logger, :console,
 That will integrate `Logrex` with its default options:
 
 ```
-iex> require Logger
-iex> Logger.info "some message"
-iex>
+iex(1)> require Logger
+Logger
+iex(2)> Logger.info "log message", field_a: 1, field_b: 2
+:ok
+iex(3)>
+INFO 19:37:01 log message                                  field_a=1 field_b=2
 ```
 
 Additionally, `Logrex` has its own optional configuration:
 
 ```elixir
 config :logrex,
-  padding:
+  padding: 44
 ```
 
 ## Documentation
