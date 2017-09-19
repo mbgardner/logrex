@@ -3,6 +3,13 @@ defmodule Logrex.Formatter do
   @default_metadata [:application, :module, :function, :file, :line, :pid]
   @default_padding 44
 
+  @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
+
+  @doc """
+  Custom Logger format function, receives four arguments and returns a formatted
+  string.
+  """
+  @spec format(atom, String.t, erl_datetime, keyword(any)) :: String.t
   def format(level, message, timestamp, metadata) do
     config = Application.get_all_env(:logrex)
     {level_display, level_color} = level_info(level)

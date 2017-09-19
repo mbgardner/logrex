@@ -1,7 +1,7 @@
-# Logrex
+# Logrex <img src="https://imgur.com/a/miTk6" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
 
-Logrex is an Elixir logging formatter inspired by [Logrus](https://github.com/sirupsen/logrus).
-Logrex makes it simple to display dynamic fields outside of the inline text, for easier grokking and
+`Logrex` is an Elixir logging formatter inspired by [Logrus](https://github.com/sirupsen/logrus).
+`Logrex` makes it simple to display dynamic fields outside of the inline text, for easier grokking and
 parsing.
 
 ## Getting Started
@@ -32,11 +32,12 @@ config :logger, :console,
   metadata: :all
 ```
 
-That will integrate `Logrex` with its default options, so that console log
-messages will display as:
+That will integrate `Logrex` with its default options:
 
 ```
-<display text>
+iex> require Logger
+iex> Logger.info "some message"
+iex>
 ```
 
 Additionally, `Logrex` has its own optional configuration:
