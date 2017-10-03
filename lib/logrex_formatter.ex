@@ -1,6 +1,7 @@
 defmodule Logrex.Formatter do
 
   @default_metadata [:application, :module, :function, :file, :line, :pid]
+  @default_metadata_format "$module $function:$line"
   @default_padding 44
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
@@ -13,15 +14,17 @@ defmodule Logrex.Formatter do
   def format(level, message, timestamp, metadata) do
     config = Application.get_all_env(:logrex)
     {level_display, level_color} = level_info(level)
-    {_standard_metadata, dynamic_fields} = split_metadata(metadata)
+    {metadata, dynamic_fields} = split_metadata(metadata)
 
     str =
-      format_level(level_display, level_color)
-      |> Kernel.<>(" ")
+      #format_level(level_display, level_color)
+      #|> Kernel.<>(" ")
+      "INFO "
       |> Kernel.<>(format_time(timestamp))
       |> Kernel.<>(" ")
-      |> Kernel.<>(format_message(message, length(dynamic_fields), config))
-      |> Kernel.<>(" ")
+      |> Kernel.<>(format_metadata(metadata, config))
+      |> Kernel.<>(" " <> message)
+      |> pad_message(length(dynamic_fields), config)
       |> Kernel.<>(format_dynamic_fields(dynamic_fields, level_color))
 
     "\n" <> str <> "\n"
@@ -42,10 +45,22 @@ defmodule Logrex.Formatter do
     |> Time.to_string
   end
 
-  defp format_message(message, 0, _config), do: message
-  defp format_message(message, _num_fields, config) do
+  defp format_metadata([], _config), do: ""
+  defp format_metadata(metadata, config) do
+    IO.puts(inspect metadata)
+    format = Keyword.get(config, :metadata_format, @default_metadata_format)
+
+    metadata
+    |> Enum.reduce(format, fn
+      {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
+      {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
+    end)
+  end
+
+  defp pad_message(message, 0, _config), do: message
+  defp pad_message(message, _num, config) do
     padding = Keyword.get(config, :padding, @default_padding)
-    String.pad_trailing(message, padding, " ")
+    String.pad_trailing(message, padding, " ") <> " "
   end
 
   defp format_dynamic_fields(fields, level_color) do

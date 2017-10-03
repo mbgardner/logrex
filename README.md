@@ -62,10 +62,8 @@ $ mix test
 
 ## To do
 
-* Add tests!
-* Add configurable standard metadata formatting
-* Add configurable level coloring
-* Use defaults based on mix environment if metadata format isn't provided
+[] Add configurable level coloring
+[] Use defaults based on mix environment if metadata format isn't provided
 
 ## License
 
@@ -73,5 +71,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* [Logrus](https://github.com/sirupsen/logrus) Go logging package
+* [Logrus](https://github.com/sirupsen/logrus)
 * [Elixir Core Team](https://elixirforum.com/groups/Elixir-Core-Team)
