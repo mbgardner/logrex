@@ -33,7 +33,7 @@ defmodule Logrex.Mixfile do
 
   defp package do
     [
-      files: ["lib", "priv", "mix.exs", "README.md", "LICENSE.md"],
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
       maintainers: ["Matthew B Gardner"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/mbgardner/logrex"}
