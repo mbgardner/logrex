@@ -1,7 +1,9 @@
 defmodule Logrex.Formatter do
+  @moduledoc """
+
+  """
 
   @default_metadata [:application, :module, :function, :file, :line, :pid]
-  @default_metadata_format "$module $function:$line"
   @default_padding 44
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
@@ -16,15 +18,15 @@ defmodule Logrex.Formatter do
     {level_display, level_color} = level_info(level)
     {metadata, dynamic_fields} = split_metadata(metadata)
 
-    str =
-      #format_level(level_display, level_color)
-      #|> Kernel.<>(" ")
-      "INFO "
-      |> Kernel.<>(format_time(timestamp))
-      |> Kernel.<>(" ")
-      |> Kernel.<>(format_metadata(metadata, config))
-      |> Kernel.<>(" " <> message)
+    meta_message =
+      format_metadata(metadata, config)
+      |> Kernel.<>(message)
       |> pad_message(length(dynamic_fields), config)
+
+    str =
+      format_level(level_display, level_color)
+      |> Kernel.<>(format_time(timestamp))
+      |> Kernel.<>(meta_message)
       |> Kernel.<>(format_dynamic_fields(dynamic_fields, level_color))
 
     "\n" <> str <> "\n"
@@ -43,15 +45,19 @@ defmodule Logrex.Formatter do
     {h, m, s}
     |> Time.from_erl!
     |> Time.to_string
+    |> Kernel.<>(" ")
   end
 
   defp format_metadata([], _config), do: ""
-  defp format_metadata(metadata, config) do
-    IO.puts(inspect metadata)
-    format = Keyword.get(config, :metadata_format, @default_metadata_format)
+  defp format_metadata(_metadata, ""), do: ""
 
-    metadata
-    |> Enum.reduce(format, fn
+  defp format_metadata(metadata, config) when is_list(config) do
+    format = Keyword.get(config, :metadata_format, "")
+    format_metadata(metadata, format)
+  end
+
+  defp format_metadata(metadata, format) when is_binary(format) do
+    Enum.reduce(metadata, format, fn
       {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
       {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
     end)
@@ -69,9 +75,9 @@ defmodule Logrex.Formatter do
     |> Enum.join(" ")
   end
 
-  defp level_info(:debug), do: {"DEBG", IO.ANSI.cyan()}
-  defp level_info(:info), do: {"INFO", IO.ANSI.normal()}
-  defp level_info(:warn), do: {"WARN", IO.ANSI.yellow()}
-  defp level_info(:error), do: {"EROR", IO.ANSI.red()}
-  defp level_info(_), do: {"????", IO.ANSI.normal()}
+  defp level_info(:debug), do: {"DEBG ", IO.ANSI.cyan()}
+  defp level_info(:info), do: {"INFO ", IO.ANSI.normal()}
+  defp level_info(:warn), do: {"WARN ", IO.ANSI.yellow()}
+  defp level_info(:error), do: {"EROR ", IO.ANSI.red()}
+  defp level_info(_), do: {"???? ", IO.ANSI.normal()}
 end

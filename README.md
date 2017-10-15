@@ -35,19 +35,17 @@ config :logger, :console,
 That will integrate `Logrex` with its default options:
 
 ```
-iex(1)> require Logger
-Logger
-iex(2)> Logger.info "log message", field_a: 1, field_b: 2
-:ok
-iex(3)>
-INFO 19:37:01 log message                                  field_a=1 field_b=2
+iex> require Logger
+iex> Logger.info "message", foo: 1, bar: 2
+INFO 02:31:06 message                                      foo=1 bar=2
 ```
 
 Additionally, `Logrex` has its own optional configuration:
 
 ```elixir
 config :logrex,
-  padding: 44
+  metadata_format: "$module $function:$line"
+  padding: 50
 ```
 
 ## Documentation
@@ -63,7 +61,6 @@ $ mix test
 ## To do
 
 [] Add configurable level coloring
-[] Use defaults based on mix environment if metadata format isn't provided
 
 ## License
 
