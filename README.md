@@ -16,7 +16,7 @@ Add it to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:logrex, "~> 0.1.0"}
+    {:logrex, "~> 0.1.1"}
   ]
 end
 ```
@@ -28,7 +28,7 @@ and set it to passthrough all metadata in `config/config.exs`:
 
 ```elixir
 config :logger, :console,
-  format: {Logrex.Console.Formatter, :format},
+  format: {Logrex.Formatter, :format},
   metadata: :all
 ```
 

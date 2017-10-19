@@ -20,7 +20,7 @@ defmodule Logrex.Formatter do
 
     meta_message =
       format_metadata(metadata, config)
-      |> Kernel.<>(message)
+      |> Kernel.<>(to_string(message))
       |> pad_message(length(dynamic_fields), config)
 
     str =
