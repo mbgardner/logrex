@@ -10,7 +10,7 @@ To use `Logrex`, just install it via Hex and add some minor configuration.
 
 ### Installation
 
-The latest version of `Logrex` is [available in Hex](https://hex.pm/docs/publish).
+The latest version of `Logrex` is [available in Hex](https://hex.pm/packages/logrex).
 Add it to your list of dependencies in `mix.exs`:
 
 ```elixir
