@@ -1,6 +1,7 @@
 defmodule Logrex.Formatter do
   @moduledoc """
-
+  A module for formatting logger metadata key/value pairs in a clean way, by
+  presenting the metadata outside of the information log text.
   """
 
   @default_metadata [:application, :module, :function, :file, :line, :pid]
@@ -8,9 +9,11 @@ defmodule Logrex.Formatter do
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
 
+  defguard inspect?(v) when is_list(v) or is_map(v) or is_pid(v) or is_tuple(v)
+
   @doc """
-  Custom Logger format function, receives four arguments and returns a formatted
-  string.
+  Custom Logger format function, which receives the Logger arguments and
+  returns a string with formatted key/value metadata pairs.
   """
   @spec format(atom, String.t, erl_datetime, keyword(any)) :: String.t
   def format(level, message, timestamp, metadata) do
@@ -23,13 +26,14 @@ defmodule Logrex.Formatter do
       |> Kernel.<>(to_string(message))
       |> pad_message(length(dynamic_fields), config)
 
-    str =
-      format_level(level_display, level_color)
-      |> Kernel.<>(format_time(timestamp))
-      |> Kernel.<>(meta_message)
-      |> Kernel.<>(format_dynamic_fields(dynamic_fields, level_color))
-
-    "\n" <> str <> "\n"
+    [
+      "\n",
+      format_level(level_display, level_color),
+      format_time(timestamp),
+      meta_message,
+      format_dynamic_fields(dynamic_fields, level_color, config),
+      "\n"
+    ]
   end
 
   defp split_metadata(metadata) do
@@ -48,36 +52,40 @@ defmodule Logrex.Formatter do
     |> Kernel.<>(" ")
   end
 
-  defp format_metadata([], _config), do: ""
-  defp format_metadata(_metadata, ""), do: ""
-
-  defp format_metadata(metadata, config) when is_list(config) do
-    format = Keyword.get(config, :metadata_format, "")
-    format_metadata(metadata, format)
-  end
-
-  defp format_metadata(metadata, format) when is_binary(format) do
+  defp format_metadata(metadata, metadata_format: format) do
     Enum.reduce(metadata, format, fn
       {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
       {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
     end)
   end
 
+  defp format_metadata([], _config), do: ""
+  defp format_metadata(metadata, _config), do: format_metadata(metadata, metadata_format: "")
+
   defp pad_message(message, 0, _config), do: message
-  defp pad_message(message, _num, config) do
-    padding = Keyword.get(config, :padding, @default_padding)
+
+  defp pad_message(message, _meta, padding: padding) do
     String.pad_trailing(message, padding, " ") <> " "
   end
 
-  defp format_dynamic_fields(fields, level_color) do
+  defp pad_message(message, meta, _config) do
+    pad_message(message, meta, padding: @default_padding)
+  end
+
+  defp format_dynamic_fields(fields, level_color, config) do
     fields
-    |> Enum.map(fn {k, v} -> "#{level_color}#{k}#{IO.ANSI.reset()}=#{v}" end)
+    |> Enum.map(fn {k, v} ->
+      "#{level_color}#{k}#{IO.ANSI.reset()}=#{format_value(v, config)}"
+    end)
     |> Enum.join(" ")
   end
+
+  defp format_value(val, auto_inspect: false), do: val
+  defp format_value(val, _config) when inspect?(val), do: inspect(val, pretty: true)
+  defp format_value(val, _config), do: val
 
   defp level_info(:debug), do: {"DEBG ", IO.ANSI.cyan()}
   defp level_info(:info), do: {"INFO ", IO.ANSI.normal()}
   defp level_info(:warn), do: {"WARN ", IO.ANSI.yellow()}
   defp level_info(:error), do: {"EROR ", IO.ANSI.red()}
-  defp level_info(_), do: {"???? ", IO.ANSI.normal()}
 end

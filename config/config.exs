@@ -28,7 +28,7 @@ use Mix.Config
 #  padding: 10
 
 config :logger, :console,
-  format: {Logrex.Formatter, :format},
+  format: {Logrex, :format},
   metadata: :all
 
 # It is also possible to import configuration files, relative to this

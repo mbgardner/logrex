@@ -4,8 +4,8 @@ defmodule Logrex.Mixfile do
   def project do
     [
       app: :logrex,
-      version: "0.1.1",
-      elixir: "~> 1.5",
+      version: "0.2.0",
+      elixir: "~> 1.7",
       description: description(),
       package: package(),
       start_permanent: Mix.env == :prod,

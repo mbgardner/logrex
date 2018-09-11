@@ -44,7 +44,8 @@ Additionally, `Logrex` has its own optional configuration:
 
 ```elixir
 config :logrex,
-  metadata_format: "$module $function:$line"
+  auto_inspect: true,
+  metadata_format: "$module $function:$line",
   padding: 50
 ```
 
