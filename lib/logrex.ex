@@ -7,23 +7,15 @@ defmodule Logrex do
   end
 
   defmacro info(chardata_or_fun, metadata \\ []) do
-    m = get_meta(metadata)
     quote do
-      require Logger
-      Logger.info(unquote(chardata_or_fun), unquote(m))
+      Logger.info(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
-  defp get_meta([]), do: []
-
-  defp get_meta(m) do
-    m
+  defp build_metadata(metadata) do
+    metadata
     |> List.wrap
     |> Enum.map(fn
-      # {{:., _, [Access, :get]}, _, [{map, _, _}, var]} ->
-      #   quote do: {unquote(var |> String.to_atom), var!(unquote(Macro.var(map, nil)))[unquote(var)]}
-      # {{:., _, [{map, _, _}, var]}, _, _} ->
-      #   quote do: {unquote(var), var!(unquote(Macro.var(map, nil)))[unquote(var)]}
       {var, _, _} when is_atom(var) ->
         quote do: {unquote(var), var!(unquote(Macro.var(var, nil)))}
       {_, _} = var -> var

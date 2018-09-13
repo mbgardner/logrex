@@ -1,12 +1,26 @@
 # Logrex <img src="https://i.imgur.com/UEbtVhA.jpg" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
 
-`Logrex` is an Elixir logging formatter inspired by [Logrus](https://github.com/sirupsen/logrus).
-`Logrex` makes it simple to display dynamic fields outside of the inline text, for easier grokking and
-parsing.
+`Logrex` is an Elixir package for more easily adding Logger metadata and
+formatting it to be more presentable to humans.
+
+It lets you write code like this:
+
+```elixir
+some_num = 1
+map = %{foo: "bar"}
+Logrex.info "Some text", [some_num, some_map: map]
+```
+
+To print this:
+
+```
+INFO 20:56:40 Some text                  some_num=1 some_map=%{foo: "bar"}
+```
 
 ## Getting Started
 
-To use `Logrex`, just install it via Hex and add some minor configuration.
+To start using `Logrex`, install it via Hex and decide which parts you
+want to use.
 
 ### Installation
 
@@ -16,10 +30,19 @@ Add it to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:logrex, "~> 0.1.1"}
+    {:logrex, "~> 0.2.0"}
   ]
 end
 ```
+
+### Logrex Modules
+
+There are two modules you might care about in Logrex; the main Logrex
+module, which makes it easier to add metadata, and Logrex.Formatter module, which formats
+metadata to be more presentable.
+
+
+
 
 ### Configuration
 
@@ -28,7 +51,7 @@ and set it to passthrough all metadata in `config/config.exs`:
 
 ```elixir
 config :logger, :console,
-  format: {Logrex.Formatter, :format},
+  format: {Logrex, :format},
   metadata: :all
 ```
 
