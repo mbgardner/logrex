@@ -61,7 +61,7 @@ You can use the matched variables directly:
 Logrex.info "User login", [name, login_count]
 ```
 
-Or you can access the map keys, which will be used as the metadata key:
+Or you can access the map keys, which will be used for the metadata keys:
 
 ```elixir
 Logrex.info "User login", [user.name, user.login_count]
