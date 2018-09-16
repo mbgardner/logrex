@@ -5,8 +5,15 @@ defmodule Logrex.Formatter do
   """
 
   @default_metadata [
-    :application, :module, :function, :file, :line, :pid, :crash_reason,
-    :initial_call, :registered_name
+    :application,
+    :module,
+    :function,
+    :file,
+    :line,
+    :pid,
+    :crash_reason,
+    :initial_call,
+    :registered_name
   ]
   @default_padding 44
 
@@ -16,9 +23,10 @@ defmodule Logrex.Formatter do
 
   @doc """
   Custom Logger format function, which receives the Logger arguments and
-  returns a string with formatted key/value metadata pairs.
+  returns a string with formatted key/value metadata pairs broken out to the
+  right of the message.
   """
-  @spec format(atom, String.t(), erl_datetime, keyword(any)) :: String.t()
+  @spec format(atom, String.t(), erl_datetime, keyword(any)) :: [bitstring(), ...]
   def format(level, message, timestamp, metadata) do
     config = Application.get_all_env(:logrex)
     {level_display, level_color} = level_info(level)
@@ -55,7 +63,8 @@ defmodule Logrex.Formatter do
     |> Kernel.<>(" ")
   end
 
-  defp format_metadata(metadata, format: format) do
+  # format system metadata
+  defp format_metadata(metadata, metadata_format: format) do
     Enum.reduce(metadata, format, fn
       {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
       {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
@@ -63,7 +72,7 @@ defmodule Logrex.Formatter do
   end
 
   defp format_metadata([], _config), do: ""
-  defp format_metadata(metadata, _config), do: format_metadata(metadata, format: "")
+  defp format_metadata(metadata, _config), do: format_metadata(metadata, metadata_format: "")
 
   defp pad_message(message, 0, _config), do: message
 

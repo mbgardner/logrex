@@ -1,4 +1,23 @@
 defmodule Logrex do
+  @moduledoc """
+  An Elixir package for more easily adding Logger metadata and formatting the
+  console output so it's easier for humans to parse.
+
+  It integrates with the Elixir Logger to let you write code like this:
+
+  ```
+  name = "Matt"
+  user_info = %{login_count: 1}
+  Logrex.info "New login", [name, user_info.login_count, foo: "bar"]
+  ```
+
+  To display this:
+
+  ```
+  INFO 20:56:40 New login                    user=Matt login_count=1 foo=bar
+  ```
+  """
+
   defmacro __using__(_opts) do
     quote do
       require Logger
