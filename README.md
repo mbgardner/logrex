@@ -1,31 +1,30 @@
 # Logrex <img src="https://i.imgur.com/UEbtVhA.jpg" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
 
-`Logrex` is an Elixir package for more easily adding Logger metadata and
-formatting it to be more presentable to humans.
+An Elixir package for more easily adding Logger metadata and formatting the
+console output so humans can more easily parse it.
 
 It lets you write code like this:
 
 ```elixir
-some_num = 1
-map = %{foo: "bar"}
-Logrex.info "Some text", [some_num, some_map: map]
+user = "Matt"
+login_count = 1
+Logrex.info "New login", [user, login_count]
 ```
 
 To print this:
 
 ```
-INFO 20:56:40 Some text                  some_num=1 some_map=%{foo: "bar"}
+INFO 20:56:40 New login                    user=Matt login_count=1
 ```
 
 ## Getting Started
 
-To start using `Logrex`, install it via Hex and decide which parts you
-want to use.
+To start using Logrex, install it via Hex.
 
 ### Installation
 
-The latest version of `Logrex` is [available in Hex](https://hex.pm/packages/logrex).
-Add it to your list of dependencies in `mix.exs`:
+The latest version of Logrex is [available in Hex](https://hex.pm/packages/logrex).
+Add it to your list of dependencies in your `mix.exs` file:
 
 ```elixir
 def deps do
@@ -35,19 +34,63 @@ def deps do
 end
 ```
 
-### Logrex Modules
+### Logrex Features
 
-There are two modules you might care about in Logrex; the main Logrex
-module, which makes it easier to add metadata, and Logrex.Formatter module, which formats
-metadata to be more presentable.
+There are two features in Logrex that can be used together or separately;
+generation of metadata and the formatter.
+
+#### Metadata Generation
+
+Using metadata fields to capture metrics and other values of interest in log
+output works really well, but a common pattern arises where variables names and
+their corresponding keys are duplicated. Take the following example:
+
+```elixir
+%{name: name, login_count: login_count} = user
+Logger.info "User login", name: name, login_count: login_count
+```
+
+Logrex uses a macro to generate the keyword list passed to the Logger functions.
+Both of the samples below will generate the equivalent `Logger.info/2` call
+above.
 
 
+You can use the matched variables directly:
 
+```elixir
+%{name: name, login_count: login_count} = user
+Logrex.info "User login", [name, login_count]
+```
 
-### Configuration
+Or, you can access the map keys, which will be used as the metadata key:
 
-To use the `Logrex` formatter, add it to the standard console logger configuration
-and set it to passthrough all metadata in `config/config.exs`:
+```elixir
+Logrex.info "User login", [user.name, user.login_count]
+```
+
+For metadata generation, you must `use Logrex` at the top of your module, which
+itself uses Logger.
+
+> Note that Elixir syntax rules apply, if you want to mix variables and keyword
+> tuples via shorthand, you have to place them inside brackets and the tuples
+> have to be last. For example, this is valid:
+>
+> Logrex.info "msg", [a, b, c: 1]
+>
+> And these aren't:
+>
+> Logrex.info "msg", a, b
+> Logrex.info "msg", [c: 1, a, b]
+
+#### Console Formatter
+
+By default, the Elixir Logger defines a whitelist of metadata fields and
+requires that any additional fields be explicitly added. The Logrex formatter
+instead allows for dynamic metadata fields and separates them from the inline
+log text.
+
+To use the Logrex console formatter, set it as the console formatter in your
+logger configuration, and set it to passthrough all metadata fields.
 
 ```elixir
 config :logger, :console,
@@ -55,7 +98,7 @@ config :logger, :console,
   metadata: :all
 ```
 
-That will integrate `Logrex` with its default options:
+That will pass log output to the formatter with its default options:
 
 ```
 iex> require Logger
@@ -63,7 +106,10 @@ iex> Logger.info "message", foo: 1, bar: 2
 INFO 02:31:06 message                                      foo=1 bar=2
 ```
 
-Additionally, `Logrex` has its own optional configuration:
+> Note in the example above that the formatter does not rely on using Logrex's
+> metadata generation, you can use it by itself with Logger.
+
+Additionally, Logrex has its own optional formatting configuration:
 
 ```elixir
 config :logrex,
@@ -72,9 +118,20 @@ config :logrex,
   padding: 50
 ```
 
+## Configuration Options
+
+Config | Default | Description
+-------| ------- | -----------
+`auto_inspect` | true | the Logrex formatter will automatically call inspect on
+metadata values which are lists, maps, pids, or tuples
+`format` | `<level> <time> <sys meta> <msg> <dynamic meta>` | the default format
+of log messages; the format of the system metadata can be defined as described
+in the [Logger docs](https://hexdocs.pm/logger/Logger.html#module-metadata) 
+`padding` | 44 | the minimum character width of the main log message
+
 ## Documentation
 
-`Logrex` documenation is published at [https://hexdocs.pm/logrex](https://hexdocs.pm/logrex).
+Logrex documenation is published at [https://hexdocs.pm/logrex](https://hexdocs.pm/logrex).
 
 ## Running the tests
 
