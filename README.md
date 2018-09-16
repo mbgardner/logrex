@@ -1,7 +1,6 @@
 # Logrex <img src="https://i.imgur.com/UEbtVhA.jpg" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
 
-An Elixir package for more easily adding Logger metadata and formatting the
-console output so humans can more easily parse it.
+An Elixir package for more easily adding Logger metadata and formatting the console output so it's easier for humans to parse.
 
 It lets you write code like this:
 
@@ -11,7 +10,7 @@ login_count = 1
 Logrex.info "New login", [user, login_count]
 ```
 
-To print this:
+To display this:
 
 ```
 INFO 20:56:40 New login                    user=Matt login_count=1
@@ -62,7 +61,7 @@ You can use the matched variables directly:
 Logrex.info "User login", [name, login_count]
 ```
 
-Or, you can access the map keys, which will be used as the metadata key:
+Or you can access the map keys, which will be used as the metadata key:
 
 ```elixir
 Logrex.info "User login", [user.name, user.login_count]
@@ -80,6 +79,7 @@ itself uses Logger.
 > And these aren't:
 >
 > Logrex.info "msg", a, b
+>
 > Logrex.info "msg", [c: 1, a, b]
 
 #### Console Formatter
@@ -122,11 +122,8 @@ config :logrex,
 
 Config | Default | Description
 -------| ------- | -----------
-`auto_inspect` | true | the Logrex formatter will automatically call inspect on
-metadata values which are lists, maps, pids, or tuples
-`format` | `<level> <time> <sys meta> <msg> <dynamic meta>` | the default format
-of log messages; the format of the system metadata can be defined as described
-in the [Logger docs](https://hexdocs.pm/logger/Logger.html#module-metadata) 
+`auto_inspect` | true | the Logrex formatter will automatically call inspect on metadata values which are lists, maps, pids, or tuples
+`metadata_format` | empty string | the format for system metadata fields, as described in the [Logger docs](https://hexdocs.pm/logger/Logger.html#module-metadata); system metadata is displayed between the time and the log message
 `padding` | 44 | the minimum character width of the main log message
 
 ## Documentation
