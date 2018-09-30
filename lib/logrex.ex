@@ -6,6 +6,7 @@ defmodule Logrex do
   It integrates with the Elixir Logger to let you write code like this:
 
   ```
+  use Logrex
   name = "Matt"
   user_info = %{login_count: 1}
   Logrex.info "New login", [name, user_info.login_count, foo: "bar"]
