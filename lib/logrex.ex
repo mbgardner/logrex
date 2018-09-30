@@ -18,6 +18,13 @@ defmodule Logrex do
   ```
   """
 
+  @doc """
+  Custom Logger format function, which receives the Logger arguments and
+  returns a string with formatted key/value metadata pairs broken out to the
+  right of the message.
+  """
+  defdelegate format(level, message, timestamp, metadata), to: Logrex.Formatter
+
   defmacro __using__(_opts) do
     quote do
       require Logger
@@ -25,24 +32,28 @@ defmodule Logrex do
     end
   end
 
+  @doc false
   defmacro debug(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.debug(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
+  @doc false
   defmacro error(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.error(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
+  @doc false
   defmacro info(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.info(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
+  @doc false
   defmacro warn(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.warn(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
@@ -90,9 +101,8 @@ defmodule Logrex do
       end
 
     quote do
-      {unquote(meta_key), get_in(var!(unquote(Macro.var(var, nil))), unquote(key_path))}
+      {unquote(meta_key),
+       get_in(Map.delete(var!(unquote(Macro.var(var, nil))), :__struct__), unquote(key_path))}
     end
   end
-
-  defdelegate format(level, message, timestamp, metadata), to: Logrex.Formatter
 end

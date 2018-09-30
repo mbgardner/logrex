@@ -4,6 +4,8 @@ defmodule LogrexTest do
 
   import ExUnit.CaptureLog
 
+  defstruct foo: "bar"
+
   describe "generated metadata" do
     test "should display keyword lists" do
       fun = fn ->
@@ -54,6 +56,45 @@ defmodule LogrexTest do
       end
 
       assert capture_log(fun) |> rem_color =~ "b=%{c: \"d\"} c=d y=z"
+    end
+
+    test "should display structs" do
+      t = %LogrexTest{}
+
+      fun = fn ->
+        Logrex.info("test msg", t.foo)
+      end
+
+      assert capture_log(fun) |> rem_color =~ "foo=bar"
+    end
+
+    test "should display mixed data types" do
+      struct = %LogrexTest{}
+      map = %{a: %{"b" => "c"}}
+      pid_id = self() # 'pid' is a Logger metadata field
+      pid_map = %{pid_id: pid_id}
+      list = [1, 2, 3]
+      tuple = {1, 2}
+
+      fun = fn ->
+        Logrex.info("test msg", [
+          struct.foo,
+          map,
+          map.a["b"],
+          pid_id,
+          pid_map,
+          list,
+          tuple,
+          inline: "val"
+        ])
+      end
+
+      pstr = inspect(self())
+
+      expected =
+        "foo=bar map=%{a: %{\"b\" => \"c\"}} b=c pid_id=#{pstr} pid_map=%{pid_id: #{pstr}} list=[1, 2, 3] tuple={1, 2} inline=val"
+
+      assert capture_log(fun) |> rem_color =~ expected
     end
   end
 

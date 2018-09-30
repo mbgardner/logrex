@@ -4,12 +4,13 @@ defmodule Logrex.Mixfile do
   def project do
     [
       app: :logrex,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.5",
       description: description(),
       package: package(),
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      source_url: "https://github.com/mbgardner/logrex",
     ]
   end
 
@@ -28,7 +29,7 @@ defmodule Logrex.Mixfile do
   end
 
   defp description do
-    "A log formatter for displaying dynamic metadata fields."
+    "Logging for humans."
   end
 
   defp package do

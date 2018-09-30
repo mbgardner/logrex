@@ -1,8 +1,5 @@
 defmodule Logrex.Formatter do
-  @moduledoc """
-  A module for formatting logger metadata key/value pairs in a clean way, by
-  presenting the metadata outside of the information log text.
-  """
+  @moduledoc false
 
   @default_metadata [
     :application,
@@ -21,11 +18,6 @@ defmodule Logrex.Formatter do
 
   defguard inspect?(v) when is_list(v) or is_map(v) or is_pid(v) or is_tuple(v)
 
-  @doc """
-  Custom Logger format function, which receives the Logger arguments and
-  returns a string with formatted key/value metadata pairs broken out to the
-  right of the message.
-  """
   @spec format(atom, String.t(), erl_datetime, keyword(any)) :: [bitstring(), ...]
   def format(level, message, timestamp, metadata) do
     config = Application.get_all_env(:logrex)
