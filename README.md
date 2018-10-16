@@ -34,6 +34,23 @@ def deps do
 end
 ```
 
+### Use Logrex
+
+To call Logrex function in your modules, add `use Logrex` at the top:
+
+```elixir
+defmodule SomeModule do
+  use Logrex
+  
+  def some_fun do
+    foo = "bar"
+    Logrex.info "some message", foo
+  end
+end
+```
+
+Logrex requires Logger for you.
+
 ### Logrex Features
 
 There are two features in Logrex that can be used together or separately;
