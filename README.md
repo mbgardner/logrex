@@ -1,19 +1,20 @@
 # Logrex <img src="https://i.imgur.com/UEbtVhA.jpg" width="40" height="40" alt=":trex:" class="emoji" title=":trex:"/>
 
-An Elixir package for more easily adding Logger metadata and formatting the console output so it's easier for humans to parse.
+An Elixir package for more easily adding [Logger](https://hexdocs.pm/logger/Logger.html)
+metadata and formatting the console output so it's easier for humans to parse.
 
 It lets you write code like this:
 
 ```elixir
 user = "Matt"
-login_count = 1
-Logrex.info "New login", [user, login_count]
+login_info = %{total_logins: 10, from: "example.com"}
+Logrex.info "New login", [user, login_info.from, login_info.total_logins]
 ```
 
 To display this:
 
 ```
-INFO 20:56:40 New login                    user=Matt login_count=1
+INFO 20:56:40 New login               user=Matt from=example.com total_logins=10
 ```
 
 ## Getting Started
@@ -28,7 +29,7 @@ Add it to your list of dependencies in your `mix.exs` file:
 ```elixir
 def deps do
   [
-    {:logrex, "~> 0.2.1"}
+    {:logrex, "~> 0.3.0"}
   ]
 end
 ```
@@ -36,7 +37,7 @@ end
 ### Logrex Features
 
 There are two features in Logrex that can be used together or separately;
-generation of metadata and the formatter.
+generation of metadata and the console formatter.
 
 #### Metadata Generation
 
@@ -49,10 +50,9 @@ their corresponding keys are duplicated. Take the following example:
 Logger.info "User login", name: name, login_count: login_count
 ```
 
-Logrex uses a macro to generate the keyword list passed to the Logger functions.
-Both of the samples below will generate the equivalent `Logger.info/2` call
-above.
-
+Logrex exposes macros, matching the public Logger functions, which generate the
+keyword list passed as the metadata parameter to the Logger functions. Both of
+the samples below will generate the same `Logger.info/2` output as the call above.
 
 You can use the matched variables directly:
 
@@ -68,7 +68,7 @@ Logrex.info "User login", [user.name, user.login_count]
 ```
 
 For metadata generation, you must `use Logrex` at the top of your module, which
-itself uses Logger.
+itself requires Logger.
 
 > Note that Elixir syntax rules apply, if you want to mix variables and keyword
 > tuples via shorthand, you have to place them inside brackets and the tuples
@@ -109,22 +109,26 @@ INFO 02:31:06 message                                      foo=1 bar=2
 > Note in the example above that the formatter does not rely on using Logrex's
 > metadata generation, you can use it by itself with Logger.
 
-Additionally, Logrex has its own optional formatting configuration:
+Additionally, Logrex has its own optional formatting configuration.
 
-```elixir
-config :logrex,
-  auto_inspect: true,
-  metadata_format: "$module $function:$line",
-  padding: 50
-```
-
-## Configuration Options
+#### Formatter Configuration Options
 
 Config | Default | Description
 -------| ------- | -----------
 `auto_inspect` | true | the Logrex formatter will automatically call inspect on metadata values which are lists, maps, pids, or tuples
 `metadata_format` | empty string | the format for system metadata fields, as described in the [Logger docs](https://hexdocs.pm/logger/Logger.html#module-metadata); system metadata is displayed between the time and the log message
+`meta_level` | :debug | the level to log Logrex.meta/1 messages
 `padding` | 44 | the minimum character width of the main log message
+`pad_empty_messages` | false | the Logrex formatter will not apply padding to empty messages, unless set to 'true'
+
+Example Formatter Configuration Setup:
+
+```elixir
+config :logrex,
+  metadata_format: "$module $function:$line",
+  meta_level: :info,
+  padding: 50
+```
 
 ## Documentation
 

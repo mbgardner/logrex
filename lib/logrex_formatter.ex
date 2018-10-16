@@ -27,7 +27,7 @@ defmodule Logrex.Formatter do
     meta_message =
       format_metadata(metadata, config)
       |> Kernel.<>(to_string(message))
-      |> pad_message(length(dynamic_fields), config)
+      |> pad_message(config)
 
     [
       "\n",
@@ -66,14 +66,16 @@ defmodule Logrex.Formatter do
   defp format_metadata([], _config), do: ""
   defp format_metadata(metadata, _config), do: format_metadata(metadata, metadata_format: "")
 
-  defp pad_message(message, 0, _config), do: message
-
-  defp pad_message(message, _meta, padding: padding) do
-    String.pad_trailing(message, padding, " ") <> " "
+  defp pad_message("", config) do
+    case Keyword.get(config, :pad_empty_messages) do
+      true -> pad_message(" ", config)
+      _ -> ""
+    end
   end
 
-  defp pad_message(message, meta, _config) do
-    pad_message(message, meta, padding: @default_padding)
+  defp pad_message(message, config) do
+    padding = Keyword.get(config, :padding, @default_padding)
+    String.pad_trailing(message, padding, " ") <> " "
   end
 
   defp format_dynamic_fields(fields, level_color, config) do
@@ -84,8 +86,13 @@ defmodule Logrex.Formatter do
     |> Enum.join(" ")
   end
 
-  defp format_value(val, auto_inspect: false), do: val
-  defp format_value(val, _config) when inspect?(val), do: inspect(val, pretty: true)
+  defp format_value(val, config) when inspect?(val) do
+    case Keyword.get(config, :auto_inspect, true) do
+      true -> inspect(val, pretty: true)
+      _ -> val
+    end
+  end
+
   defp format_value(val, _config), do: val
 
   defp level_info(:debug), do: {"DEBG ", IO.ANSI.cyan()}

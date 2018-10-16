@@ -3,19 +3,19 @@ defmodule Logrex do
   An Elixir package for more easily adding Logger metadata and formatting the
   console output so it's easier for humans to parse.
 
-  It integrates with the Elixir Logger to let you write code like this:
+  It wraps Elixir's Logger module to let you write code like this:
 
   ```
-  use Logrex
-  name = "Matt"
-  user_info = %{login_count: 1}
-  Logrex.info "New login", [name, user_info.login_count, foo: "bar"]
+  > use Logrex
+  > name = "Matt"
+  > user_info = %{login_count: 1}
+  > Logrex.info "New login", [name, user_info.login_count]
   ```
 
   To display this:
 
   ```
-  INFO 20:56:40 New login                    user=Matt login_count=1 foo=bar
+  > INFO 20:56:40 New login                    user=Matt login_count=1
   ```
   """
 
@@ -33,31 +33,79 @@ defmodule Logrex do
     end
   end
 
-  @doc false
+  @doc """
+  Log a debug message with dynamic metadata.
+  """
   defmacro debug(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.debug(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
-  @doc false
+  @doc """
+  Log an error message with dynamic metadata.
+  """
   defmacro error(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.error(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
-  @doc false
+  @doc """
+  Log an info message with dynamic metadata.
+  """
   defmacro info(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.info(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
     end
   end
 
-  @doc false
+  @doc """
+  Log a warning message with dynamic metadata.
+  """
   defmacro warn(chardata_or_fun, metadata \\ []) do
     quote do
       Logger.warn(unquote(chardata_or_fun), unquote(build_metadata(metadata)))
+    end
+  end
+
+  @doc """
+  Logs a metadata-only message.
+
+  It is a shorthand and more explicit way of using one of the level
+  functions with an empty string as the first parameter. By default, all
+  `meta/1` calls are logged as debug, but that can be changed via the
+  `:meta_level` config.
+
+  ## Examples
+
+      Logrex.meta foo: bar
+      Logrex.meta [var1, var2]
+
+  """
+  defmacro meta(metadata \\ []) do
+    level = Application.get_env(:logrex, :meta_level, :debug)
+
+    case level do
+      :debug ->
+        quote do
+          Logger.debug("", unquote(build_metadata(metadata)))
+        end
+
+      :error ->
+        quote do
+          Logger.error("", unquote(build_metadata(metadata)))
+        end
+
+      :info ->
+        quote do
+          Logger.info("", unquote(build_metadata(metadata)))
+        end
+
+      :warn ->
+        quote do
+          Logger.warn("", unquote(build_metadata(metadata)))
+        end
     end
   end
 
