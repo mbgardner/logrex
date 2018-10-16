@@ -36,7 +36,7 @@ end
 
 ### Use Logrex
 
-To call Logrex function in your modules, add `use Logrex` at the top:
+To call Logrex functions in your modules, add `use Logrex` to the top:
 
 ```elixir
 defmodule SomeModule do
