@@ -36,7 +36,7 @@ end
 
 ### Use Logrex
 
-To call Logrex functions in your modules, add `use Logrex` to the top:
+To call Logrex functions in your modules, add `use Logrex` to the top.
 
 ```elixir
 defmodule SomeModule do
@@ -59,7 +59,7 @@ generation of metadata and the console formatter.
 #### Metadata Generation
 
 Using metadata fields to capture metrics and other values of interest in log
-output works really well, but a common pattern arises where variables names and
+output works really well, but a common pattern arises where variable names and
 their corresponding keys are duplicated. Take the following example:
 
 ```elixir
@@ -67,9 +67,9 @@ their corresponding keys are duplicated. Take the following example:
 Logger.info "User login", name: name, login_count: login_count
 ```
 
-Logrex exposes macros, matching the public Logger functions, which generate the
+Logrex exposes macros, matching the Logger macros, which generate the
 keyword list passed as the metadata parameter to the Logger functions. Both of
-the samples below will generate the same `Logger.info/2` output as the call above.
+the examples below will generate the same `Logger.info/2` output as the example above.
 
 You can use the matched variables directly:
 
