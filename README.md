@@ -8,6 +8,7 @@ It lets you write code like this:
 ```elixir
 user = "Matt"
 login_info = %{total_logins: 10, from: "example.com"}
+
 Logrex.info "New login", [user, login_info.from, login_info.total_logins]
 ```
 
@@ -29,7 +30,7 @@ Add it to your list of dependencies in your `mix.exs` file:
 ```elixir
 def deps do
   [
-    {:logrex, "~> 0.3.0"}
+    {:logrex, "~> 0.4.0"}
   ]
 end
 ```
@@ -41,7 +42,7 @@ To call Logrex functions in your modules, add `use Logrex` to the top.
 ```elixir
 defmodule SomeModule do
   use Logrex
-  
+
   def some_fun do
     foo = "bar"
     Logrex.info "some message", foo
@@ -137,6 +138,7 @@ Config | Default | Description
 `meta_level` | :debug | the level to log Logrex.meta/1 messages
 `padding` | 44 | the minimum character width of the main log message
 `pad_empty_messages` | false | the Logrex formatter will not apply padding to empty messages, unless set to 'true'
+`full_level_names` | false | display `DEBUG` and `ERROR` instead of their four-letter equivalents (DEBG, EROR)
 
 Example Formatter Configuration Setup:
 
@@ -157,10 +159,6 @@ Logrex documenation is published at [https://hexdocs.pm/logrex](https://hexdocs.
 $ mix test
 ```
 
-## To do
-
-[] Add configurable level coloring
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
@@ -168,4 +166,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 * [Logrus](https://github.com/sirupsen/logrus)
-* [Elixir Core Team](https://elixirforum.com/groups/Elixir-Core-Team)

@@ -1,6 +1,8 @@
 defmodule Logrex.Formatter do
   @moduledoc false
 
+  alias IO.ANSI
+
   @default_metadata [
     :application,
     :module,
@@ -12,7 +14,30 @@ defmodule Logrex.Formatter do
     :initial_call,
     :registered_name
   ]
+
   @default_padding 44
+
+  default_colors = %{
+    enabled: true,
+    debug: :cyan,
+    info: :normal,
+    warn: :yellow,
+    error: :red
+  }
+
+  logger_colors =
+    Application.get_env(:logger, :console, [])
+    |> Keyword.get(:colors, [])
+    |> Enum.into(%{})
+
+  @colors Map.merge(default_colors, logger_colors)
+
+  @level_names %{
+    debug: ["DEBG", "DEBUG"],
+    info:  ["INFO", "INFO"],
+    warn:  ["WARN", "WARN"],
+    error: ["EROR", "ERROR"]
+  }
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
 
@@ -21,7 +46,7 @@ defmodule Logrex.Formatter do
   @spec format(atom, String.t(), erl_datetime, keyword(any)) :: [bitstring(), ...]
   def format(level, message, timestamp, metadata) do
     config = Application.get_all_env(:logrex)
-    {level_display, level_color} = level_info(level)
+
     {metadata, dynamic_fields} = split_metadata(metadata)
 
     meta_message =
@@ -31,10 +56,13 @@ defmodule Logrex.Formatter do
 
     [
       "\n",
-      format_level(level_display, level_color),
+      ANSI.format_fragment(@colors[level], @colors.enabled),
+      level_name(level, config),
+      " ",
+      ANSI.format_fragment(:reset, @colors.enabled),
       format_time(timestamp),
       meta_message,
-      format_dynamic_fields(dynamic_fields, level_color, config),
+      format_dynamic_fields(dynamic_fields, @colors[level], config),
       "\n"
     ]
   end
@@ -42,10 +70,6 @@ defmodule Logrex.Formatter do
   defp split_metadata(metadata) do
     metadata
     |> Enum.split_with(fn {k, _v} -> k in @default_metadata end)
-  end
-
-  defp format_level(display, color) do
-    color <> display <> IO.ANSI.reset()
   end
 
   defp format_time({_date, {h, m, s, _ms}}) do
@@ -78,25 +102,41 @@ defmodule Logrex.Formatter do
     String.pad_trailing(message, padding, " ") <> " "
   end
 
-  defp format_dynamic_fields(fields, level_color, config) do
+  defp format_dynamic_fields(fields, color, config) do
     fields
-    |> Enum.map(fn {k, v} ->
-      "#{level_color}#{k}#{IO.ANSI.reset()}=#{format_value(v, config)}"
-    end)
+    |> Enum.map(fn {k, v} -> "#{format_dynamic_field(k, color)}=#{format_value(v, config)}" end)
     |> Enum.join(" ")
+  end
+
+  defp format_dynamic_field(field, color) do
+    [
+      ANSI.format_fragment(color, @colors.enabled),
+      to_string(field),
+      ANSI.format_fragment(:reset, @colors.enabled)
+    ]
   end
 
   defp format_value(val, config) when inspect?(val) do
     case Keyword.get(config, :auto_inspect, true) do
-      true -> inspect(val, pretty: true)
-      _ -> val
+      true ->
+        inspect(val, pretty: true)
+
+      _ ->
+        to_string(val)
     end
   end
 
   defp format_value(val, _config), do: val
 
-  defp level_info(:debug), do: {"DEBG ", IO.ANSI.cyan()}
-  defp level_info(:info), do: {"INFO ", IO.ANSI.normal()}
-  defp level_info(:warn), do: {"WARN ", IO.ANSI.yellow()}
-  defp level_info(:error), do: {"EROR ", IO.ANSI.red()}
+  defp level_name(level, config) do
+    [short, long] = @level_names[level]
+
+    case Keyword.get(config, :full_level_names) do
+      true ->
+        long
+
+      _ ->
+        short
+    end
+  end
 end
