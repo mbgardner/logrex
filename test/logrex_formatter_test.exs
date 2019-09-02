@@ -16,7 +16,10 @@ defmodule LogrexFormatterTest do
 
       expected = [
         "\n",
-        "\e[22mINFO \e[0m",
+        [[] | "\e[22m"],
+        "INFO",
+        " ",
+        [[] | "\e[0m"],
         "10:20:30 ",
         "info message                                 ",
         "",
@@ -33,7 +36,10 @@ defmodule LogrexFormatterTest do
 
       expected = [
         "\n",
-        "\e[36mDEBG \e[0m",
+        [[] | "\e[36m"],
+        "DEBG",
+        " ",
+        [[] | "\e[0m"],
         "10:20:30 ",
         "debug message                                ",
         "\e[36ma\e[0m=1",
@@ -50,7 +56,10 @@ defmodule LogrexFormatterTest do
 
       expected = [
         "\n",
-        "\e[31mEROR \e[0m",
+        [[] | "\e[31m"],
+        "EROR",
+        " ",
+        [[] | "\e[0m"],
         "10:20:30 ",
         "error message        ",
         "\e[31ma\e[0m=1",

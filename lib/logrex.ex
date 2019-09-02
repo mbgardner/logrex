@@ -122,6 +122,7 @@ defmodule Logrex do
       ast ->
         build_path(ast)
     end)
+    |> Enum.reverse()
   end
 
   defp build_path(ast) do

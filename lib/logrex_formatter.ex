@@ -34,8 +34,8 @@ defmodule Logrex.Formatter do
 
   @level_names %{
     debug: ["DEBG", "DEBUG"],
-    info:  ["INFO", "INFO"],
-    warn:  ["WARN", "WARN"],
+    info: ["INFO", "INFO"],
+    warn: ["WARN", "WARN"],
     error: ["EROR", "ERROR"]
   }
 
