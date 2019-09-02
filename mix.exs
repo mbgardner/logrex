@@ -5,12 +5,12 @@ defmodule Logrex.Mixfile do
     [
       app: :logrex,
       version: "0.4.0",
-      elixir: "~> 1.5",
+      elixir: "~> 1.9",
       description: description(),
       package: package(),
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
-      source_url: "https://github.com/mbgardner/logrex",
+      source_url: "https://github.com/mbgardner/logrex"
     ]
   end
 
@@ -24,7 +24,7 @@ defmodule Logrex.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 
