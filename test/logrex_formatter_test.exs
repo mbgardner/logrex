@@ -1,6 +1,8 @@
 defmodule LogrexFormatterTest do
   use ExUnit.Case
 
+  import ExUnit.CaptureLog
+
   alias Logrex.Formatter
 
   setup do
@@ -8,6 +10,9 @@ defmodule LogrexFormatterTest do
     Application.delete_env(:logrex, :auto_inspect)
     Application.delete_env(:logrex, :padding)
     Application.delete_env(:logrex, :pad_empty_messages)
+    Application.delete_env(:logrex, :full_level_names)
+
+    Logger.configure_backend(:console, colors: [enabled: true])
   end
 
   describe "format/4" do
@@ -131,6 +136,40 @@ defmodule LogrexFormatterTest do
       result = Formatter.format(:info, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
       expect = "10:20:30 a=1"
       assert result |> Enum.join("") |> rem_color =~ expect
+    end
+  end
+
+  describe "full_level_names config" do
+    test "displays full level names when true" do
+      Application.put_env(:logrex, :full_level_names, true)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "ERROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+
+    test "displays short level names when not true" do
+      Application.put_env(:logrex, :full_level_names, false)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "EROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+  end
+
+  describe "colors config" do
+    test "includes colors when Logger colors are enabled" do
+      Application.put_env(:logger, :colors, enabled: true)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, [])
+      assert Enum.find(result, fn i -> i == [[] | IO.ANSI.red()] end)
+    end
+
+    test "omits colors when Logger colors are disabled" do
+      Logger.configure_backend(:console, colors: [enabled: false])
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, [])
+      refute Enum.find(result, fn i -> i == [[] | IO.ANSI.red()] end)
     end
   end
 

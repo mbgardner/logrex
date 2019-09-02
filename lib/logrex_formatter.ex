@@ -17,20 +17,13 @@ defmodule Logrex.Formatter do
 
   @default_padding 44
 
-  default_colors = %{
+  @default_colors %{
     enabled: true,
     debug: :cyan,
     info: :normal,
     warn: :yellow,
     error: :red
   }
-
-  logger_colors =
-    Application.get_env(:logger, :console, [])
-    |> Keyword.get(:colors, [])
-    |> Enum.into(%{})
-
-  @colors Map.merge(default_colors, logger_colors)
 
   @level_names %{
     debug: ["DEBG", "DEBUG"],
@@ -46,6 +39,7 @@ defmodule Logrex.Formatter do
   @spec format(atom, String.t(), erl_datetime, keyword(any)) :: [bitstring(), ...]
   def format(level, message, timestamp, metadata) do
     config = Application.get_all_env(:logrex)
+    colors = get_colors()
 
     {metadata, dynamic_fields} = split_metadata(metadata)
 
@@ -56,13 +50,13 @@ defmodule Logrex.Formatter do
 
     [
       "\n",
-      ANSI.format_fragment(@colors[level], @colors.enabled),
+      ANSI.format_fragment(colors[level], colors.enabled),
       level_name(level, config),
       " ",
-      ANSI.format_fragment(:reset, @colors.enabled),
+      ANSI.format_fragment(:reset, colors.enabled),
       format_time(timestamp),
       meta_message,
-      format_dynamic_fields(dynamic_fields, @colors[level], config),
+      format_dynamic_fields(dynamic_fields, level, colors, config),
       "\n"
     ]
   end
@@ -102,19 +96,23 @@ defmodule Logrex.Formatter do
     String.pad_trailing(message, padding, " ") <> " "
   end
 
-  defp format_dynamic_fields(fields, color, config) do
+  defp format_dynamic_fields(fields, level, colors, config) do
     fields
-    |> Enum.map(fn {k, v} -> "#{format_dynamic_field(k, color)}=#{format_value(v, config)}" end)
+    |> Enum.map(fn {k, v} ->
+      "#{format_dynamic_field(k, level, colors)}=#{format_value(v, config)}"
+    end)
     |> Enum.join(" ")
   end
 
-  defp format_dynamic_field(field, color) do
+  defp format_dynamic_field(field, level, %{enabled: true} = colors) do
     [
-      ANSI.format_fragment(color, @colors.enabled),
+      ANSI.format_fragment(colors[level]),
       to_string(field),
-      ANSI.format_fragment(:reset, @colors.enabled)
+      ANSI.format_fragment(:reset)
     ]
   end
+
+  defp format_dynamic_field(field, _level, _colors), do: [to_string(field)]
 
   defp format_value(val, config) when inspect?(val) do
     case Keyword.get(config, :auto_inspect, true) do
@@ -138,5 +136,14 @@ defmodule Logrex.Formatter do
       _ ->
         short
     end
+  end
+
+  defp get_colors do
+    logger_colors =
+      Application.get_env(:logger, :console, [])
+      |> Keyword.get(:colors, [])
+      |> Enum.into(%{})
+
+    Map.merge(@default_colors, logger_colors)
   end
 end
