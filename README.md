@@ -149,6 +149,11 @@ config :logrex,
   padding: 50
 ```
 
+#### Colors
+
+Logrex defers to [Logger color settings](https://hexdocs.pm/logger/Logger.html#module-console-backend) --
+use that configuration to disable or change level colors.
+
 ## Documentation
 
 Logrex documenation is published at [https://hexdocs.pm/logrex](https://hexdocs.pm/logrex).
