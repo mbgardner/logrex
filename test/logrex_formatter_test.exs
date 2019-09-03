@@ -1,8 +1,6 @@
 defmodule LogrexFormatterTest do
   use ExUnit.Case
 
-  import ExUnit.CaptureLog
-
   alias Logrex.Formatter
 
   setup do
