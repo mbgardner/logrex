@@ -4,7 +4,7 @@ defmodule Logrex.Mixfile do
   def project do
     [
       app: :logrex,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.7",
       description: description(),
       package: package(),
