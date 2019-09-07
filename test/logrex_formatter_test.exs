@@ -6,6 +6,7 @@ defmodule LogrexFormatterTest do
   setup do
     # clear config fields
     Application.delete_env(:logrex, :auto_inspect)
+    Application.delete_env(:logrex, :metadata_format)
     Application.delete_env(:logrex, :padding)
     Application.delete_env(:logrex, :pad_empty_messages)
     Application.delete_env(:logrex, :full_level_names)
@@ -118,6 +119,16 @@ defmodule LogrexFormatterTest do
     end
   end
 
+  describe "metadata_format config" do
+    test "replaces standard metadata tags" do
+      Application.put_env(:logrex, :metadata_format, "$pid")
+
+      result = Formatter.format(:info, "", {{1970, 1, 1}, {10, 20, 30, 500}}, pid: self())
+      expect = "10:20:30 #{self() |> inspect()}"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+  end
+
   describe "pad_empty_message config" do
     test "pads an empty message if set to true" do
       Application.put_env(:logrex, :padding, 10)
@@ -168,6 +179,20 @@ defmodule LogrexFormatterTest do
 
       result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, [])
       refute Enum.find(result, fn i -> i == [[] | IO.ANSI.red()] end)
+    end
+  end
+
+  describe "multiple config options" do
+    test "don't intefere with each other" do
+      Application.put_env(:logrex, :metadata_format, "pid:$pid")
+      Application.put_env(:logrex, :full_level_names, true)
+      Application.put_env(:logrex, :padding, 25)
+
+      result =
+        Formatter.format(:error, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1, pid: self())
+
+      expect = "ERROR 10:20:30 pid:#{self() |> inspect}msg      a=1"
+      assert result |> Enum.join("") |> rem_color |> String.trim() == expect
     end
   end
 

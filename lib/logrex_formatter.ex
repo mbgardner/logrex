@@ -26,10 +26,10 @@ defmodule Logrex.Formatter do
   }
 
   @level_names %{
-    debug: ["DEBG", "DEBUG"],
-    info: ["INFO", "INFO"],
-    warn: ["WARN", "WARN"],
-    error: ["EROR", "ERROR"]
+    debug: %{short: "DEBG", long: "DEBUG"},
+    info: %{short: "INFO", long: "INFO"},
+    warn: %{short: "WARN", long: "WARN"},
+    error: %{short: "EROR", long: "ERROR"}
   }
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
@@ -38,7 +38,7 @@ defmodule Logrex.Formatter do
 
   @spec format(atom, String.t(), erl_datetime, keyword(any)) :: [bitstring(), ...]
   def format(level, message, timestamp, metadata) do
-    config = Application.get_all_env(:logrex)
+    config = Application.get_all_env(:logrex) |> Enum.into(%{})
     colors = get_colors()
 
     {metadata, dynamic_fields} = split_metadata(metadata)
@@ -74,25 +74,20 @@ defmodule Logrex.Formatter do
   end
 
   # format system metadata
-  defp format_metadata(metadata, metadata_format: format) do
+  defp format_metadata(metadata, %{metadata_format: format}) do
     Enum.reduce(metadata, format, fn
       {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
       {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
     end)
   end
 
-  defp format_metadata([], _config), do: ""
-  defp format_metadata(metadata, _config), do: format_metadata(metadata, metadata_format: "")
+  defp format_metadata(_metadata, _config), do: ""
 
-  defp pad_message("", config) do
-    case Keyword.get(config, :pad_empty_messages) do
-      true -> pad_message(" ", config)
-      _ -> ""
-    end
-  end
+  defp pad_message("", %{pad_empty_messages: true} = config), do: pad_message(" ", config)
+  defp pad_message("", _config), do: ""
 
   defp pad_message(message, config) do
-    padding = Keyword.get(config, :padding, @default_padding)
+    padding = Map.get(config, :padding, @default_padding)
     String.pad_trailing(message, padding, " ") <> " "
   end
 
@@ -114,29 +109,12 @@ defmodule Logrex.Formatter do
 
   defp format_dynamic_field(field, _level, _colors), do: [to_string(field)]
 
-  defp format_value(val, config) when inspect?(val) do
-    case Keyword.get(config, :auto_inspect, true) do
-      true ->
-        inspect(val, pretty: true)
-
-      _ ->
-        to_string(val)
-    end
-  end
-
+  defp format_value(val, %{auto_inspect: false}) when inspect?(val), do: to_string(val)
+  defp format_value(val, _config) when inspect?(val), do: inspect(val, pretty: true)
   defp format_value(val, _config), do: val
 
-  defp level_name(level, config) do
-    [short, long] = @level_names[level]
-
-    case Keyword.get(config, :full_level_names) do
-      true ->
-        long
-
-      _ ->
-        short
-    end
-  end
+  defp level_name(level, %{full_level_names: true}), do: @level_names[level].long
+  defp level_name(level, _config), do: @level_names[level].short
 
   defp get_colors do
     logger_colors =

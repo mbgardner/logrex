@@ -30,7 +30,7 @@ Add it to your list of dependencies in your `mix.exs` file:
 ```elixir
 def deps do
   [
-    {:logrex, "~> 0.4.1"}
+    {:logrex, "~> 0.4.2"}
   ]
 end
 ```
