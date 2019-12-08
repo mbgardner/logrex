@@ -54,7 +54,7 @@ defmodule Logrex.Formatter do
       level_name(level, config),
       " ",
       ANSI.format_fragment(:reset, colors.enabled),
-      format_time(timestamp),
+      format_timestamp(timestamp, config),
       meta_message,
       format_dynamic_fields(dynamic_fields, level, colors, config),
       "\n"
@@ -66,7 +66,14 @@ defmodule Logrex.Formatter do
     |> Enum.split_with(fn {k, _v} -> k in @default_metadata end)
   end
 
-  defp format_time({_date, {h, m, s, _ms}}) do
+  defp format_timestamp({date, {h, m, s, _ms}}, %{show_date: true}) do
+    {date, {h, m, s}}
+    |> NaiveDateTime.from_erl!
+    |> NaiveDateTime.to_iso8601()
+    |> Kernel.<>(" ")
+  end
+
+  defp format_timestamp({_date, {h, m, s, _ms}}, _config) do
     {h, m, s}
     |> Time.from_erl!()
     |> Time.to_string()

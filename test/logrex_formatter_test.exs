@@ -11,7 +11,8 @@ defmodule LogrexFormatterTest do
       :padding,
       :pad_empty_messages,
       :full_level_names,
-      :show_elixir_prefix
+      :show_elixir_prefix,
+      :show_date
     ]
     |> Enum.each(&Application.delete_env(:logrex, &1))
 
@@ -209,6 +210,26 @@ defmodule LogrexFormatterTest do
         Formatter.format(:error, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, module: "#{__MODULE__}")
 
       expect = "EROR 10:20:30 module:#{trim_mod}msg"
+      assert result |> Enum.join("") |> rem_color |> String.trim() == expect
+    end
+  end
+
+  describe "show_date config" do
+    test "includes date in timestamp when enabled" do
+      Application.put_env(:logrex, :show_date, true)
+
+      result =
+        Formatter.format(:error, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, [])
+
+      expect = "EROR 1970-01-01T10:20:30 msg"
+      assert result |> Enum.join("") |> rem_color |> String.trim() == expect
+    end
+
+    test "excludes date from timestamp when not enabled" do
+      result =
+        Formatter.format(:error, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, [])
+
+      expect = "EROR 10:20:30 msg"
       assert result |> Enum.join("") |> rem_color |> String.trim() == expect
     end
   end

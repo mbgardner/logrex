@@ -140,6 +140,7 @@ Config | Default | Description
 `pad_empty_messages` | false | the Logrex formatter will not apply padding to empty messages, unless set to 'true'
 `full_level_names` | false | display `DEBUG` and `ERROR` instead of their four-letter equivalents (DEBG, EROR)
 `show_elixir_prefix` | false | remove the `Elixir.` module prefix when displaying the module name
+`show_date` | false | includes the date in the log timestamp
 
 Example Formatter Configuration Setup:
 
