@@ -30,7 +30,7 @@ Add it to your list of dependencies in your `mix.exs` file:
 ```elixir
 def deps do
   [
-    {:logrex, "~> 0.4.2"}
+    {:logrex, "~> 0.5.0"}
   ]
 end
 ```
@@ -139,6 +139,7 @@ Config | Default | Description
 `padding` | 44 | the minimum character width of the main log message
 `pad_empty_messages` | false | the Logrex formatter will not apply padding to empty messages, unless set to 'true'
 `full_level_names` | false | display `DEBUG` and `ERROR` instead of their four-letter equivalents (DEBG, EROR)
+`show_elixir_prefix` | false | remove the `Elixir.` module prefix when displaying the module name
 
 Example Formatter Configuration Setup:
 

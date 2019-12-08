@@ -74,14 +74,18 @@ defmodule Logrex.Formatter do
   end
 
   # format system metadata
-  defp format_metadata(metadata, %{metadata_format: format}) do
+  defp format_metadata(metadata, %{metadata_format: format} = config) do
     Enum.reduce(metadata, format, fn
+      {:module, v}, acc -> String.replace(acc, "$module", format_module(v, config))
       {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
       {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
     end)
   end
 
   defp format_metadata(_metadata, _config), do: ""
+
+  defp format_module(name, %{show_elixir_prefix: true}), do: name
+  defp format_module(name, _), do: String.replace_prefix(name, "Elixir.", "")
 
   defp pad_message("", %{pad_empty_messages: true} = config), do: pad_message(" ", config)
   defp pad_message("", _config), do: ""

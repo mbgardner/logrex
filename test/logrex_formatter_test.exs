@@ -5,11 +5,15 @@ defmodule LogrexFormatterTest do
 
   setup do
     # clear config fields
-    Application.delete_env(:logrex, :auto_inspect)
-    Application.delete_env(:logrex, :metadata_format)
-    Application.delete_env(:logrex, :padding)
-    Application.delete_env(:logrex, :pad_empty_messages)
-    Application.delete_env(:logrex, :full_level_names)
+    [
+      :auto_inspect,
+      :metadata_format,
+      :padding,
+      :pad_empty_messages,
+      :full_level_names,
+      :show_elixir_prefix
+    ]
+    |> Enum.each(&Application.delete_env(:logrex, &1))
 
     Logger.configure_backend(:console, colors: [enabled: true])
   end
@@ -179,6 +183,33 @@ defmodule LogrexFormatterTest do
 
       result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, [])
       refute Enum.find(result, fn i -> i == [[] | IO.ANSI.red()] end)
+    end
+  end
+
+  describe "show_elixir_prefix config" do
+    test "displays Elixir module prefix when enabled" do
+      Application.put_env(:logrex, :metadata_format, "module:$module")
+      Application.put_env(:logrex, :show_elixir_prefix, true)
+
+      full_mod = "#{__MODULE__}"
+
+      result =
+        Formatter.format(:error, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, module: "#{__MODULE__}")
+
+      expect = "EROR 10:20:30 module:#{full_mod}msg"
+      assert result |> Enum.join("") |> rem_color |> String.trim() == expect
+    end
+
+    test "removes Elixir module prefix when not enabled" do
+      Application.put_env(:logrex, :metadata_format, "module:$module")
+
+      trim_mod = String.replace_prefix("#{__MODULE__}", "Elixir.", "")
+
+      result =
+        Formatter.format(:error, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, module: "#{__MODULE__}")
+
+      expect = "EROR 10:20:30 module:#{trim_mod}msg"
+      assert result |> Enum.join("") |> rem_color |> String.trim() == expect
     end
   end
 
