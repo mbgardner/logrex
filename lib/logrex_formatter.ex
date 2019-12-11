@@ -91,8 +91,8 @@ defmodule Logrex.Formatter do
 
   defp format_metadata(_metadata, _config), do: ""
 
-  defp format_module(name, %{show_elixir_prefix: true}), do: name
-  defp format_module(name, _), do: String.replace_prefix(name, "Elixir.", "")
+  defp format_module(name, %{show_elixir_prefix: true}), do: to_string(name)
+  defp format_module(name, _), do: String.replace_prefix(to_string(name), "Elixir.", "")
 
   defp pad_message("", %{pad_empty_messages: true} = config), do: pad_message(" ", config)
   defp pad_message("", _config), do: ""
