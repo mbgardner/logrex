@@ -109,6 +109,22 @@ defmodule Logrex do
     end
   end
 
+  @doc """
+  Similar to `IO.inspect`, inspects a term and returns it. However, the
+  inspection will be part of a normal debug log message and the term will
+  be included as log metadata.
+
+  This is especially useful within pipelines so you can log a term (with
+  a message and any other metadata) and pass it through to the next step in
+  the pipeline.
+  """
+  defmacro inspect(term, chardata_or_fun \\ "", metadata \\ []) do
+    quote do
+      Logger.debug(unquote(chardata_or_fun), unquote(build_metadata(metadata ++ [term: term])))
+      unquote(term)
+    end
+  end
+
   defp build_metadata(metadata) do
     metadata
     |> List.wrap()
