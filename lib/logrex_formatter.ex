@@ -34,7 +34,7 @@ defmodule Logrex.Formatter do
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
 
-  defguard inspect?(v) when is_list(v) or is_map(v) or is_pid(v) or is_tuple(v)
+  defguard inspect?(v) when is_list(v) or is_map(v) or is_pid(v) or is_tuple(v) or is_function(v)
 
   @spec format(atom, String.t(), erl_datetime, keyword(any)) :: [bitstring(), ...]
   def format(level, message, timestamp, metadata) do
@@ -121,8 +121,14 @@ defmodule Logrex.Formatter do
   defp format_dynamic_field(field, _level, _colors), do: [to_string(field)]
 
   defp format_value(val, %{auto_inspect: false}) when inspect?(val), do: to_string(val)
-  defp format_value(val, _config) when inspect?(val), do: inspect(val, pretty: true)
-  defp format_value(val, _config), do: val
+  defp format_value(val, %{auto_inspect: false}), do: val
+  defp format_value(val, _config) do
+    if !String.Chars.impl_for(val) or is_list(val) do
+      inspect(val)
+    else
+      val
+    end
+  end
 
   defp level_name(level, %{full_level_names: true}), do: @level_names[level].long
   defp level_name(level, _config), do: @level_names[level].short

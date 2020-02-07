@@ -112,6 +112,14 @@ defmodule LogrexFormatterTest do
       assert result |> Enum.join("") |> rem_color =~ "a={\"foo\", \"bar\"}"
     end
 
+    test "inspects functions" do
+      a = fn -> "foo" end
+
+      result = Formatter.format(:info, "msg", {{1970, 1, 1}, {10, 20, 30, 500}}, a: a)
+
+      assert result |> Enum.join("") |> rem_color =~ "a=#Function<"
+    end
+
     test "raises if set to false and given a value that requires inspect" do
       Application.put_env(:logrex, :auto_inspect, false)
       a = %{b: "c"}
