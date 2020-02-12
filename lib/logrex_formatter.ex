@@ -5,14 +5,16 @@ defmodule Logrex.Formatter do
 
   @default_metadata [
     :application,
+    :mfa,
     :module,
-    :function,
     :file,
     :line,
     :pid,
-    :crash_reason,
     :initial_call,
-    :registered_name
+    :registered_name,
+    :domain,
+    :crash_reason,
+    :gl
   ]
 
   @default_padding 44
@@ -84,8 +86,9 @@ defmodule Logrex.Formatter do
   defp format_metadata(metadata, %{metadata_format: format} = config) do
     Enum.reduce(metadata, format, fn
       {:module, v}, acc -> String.replace(acc, "$module", format_module(v, config))
-      {:pid, v}, acc -> String.replace(acc, "$pid", inspect(v))
-      {k, v}, acc -> String.replace(acc, "$#{k}", to_string(v))
+      {k, v}, acc ->
+        v = if String.Chars.impl_for(v), do: v, else: inspect(v)
+        String.replace(acc, "$#{k}", v)
     end)
   end
 
@@ -124,7 +127,7 @@ defmodule Logrex.Formatter do
   defp format_value(val, %{auto_inspect: false}), do: val
   defp format_value(val, _config) do
     if !String.Chars.impl_for(val) or is_list(val) do
-      inspect(val)
+      inspect(val, pretty: true)
     else
       val
     end
