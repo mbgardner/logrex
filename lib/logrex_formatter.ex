@@ -129,7 +129,7 @@ defmodule Logrex.Formatter do
     if !String.Chars.impl_for(val) or is_list(val) do
       inspect(val, pretty: true)
     else
-      val
+      to_string(val)
     end
   end
 
