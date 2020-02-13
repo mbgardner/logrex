@@ -87,7 +87,7 @@ defmodule Logrex.Formatter do
     Enum.reduce(metadata, format, fn
       {:module, v}, acc -> String.replace(acc, "$module", format_module(v, config))
       {k, v}, acc ->
-        v = if String.Chars.impl_for(v), do: v, else: inspect(v)
+        v = if String.Chars.impl_for(v), do: to_string(v), else: inspect(v)
         String.replace(acc, "$#{k}", v)
     end)
   end
