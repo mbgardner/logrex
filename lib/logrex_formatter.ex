@@ -70,7 +70,7 @@ defmodule Logrex.Formatter do
 
   defp format_timestamp({date, {h, m, s, _ms}}, %{show_date: true}) do
     {date, {h, m, s}}
-    |> NaiveDateTime.from_erl!
+    |> NaiveDateTime.from_erl!()
     |> NaiveDateTime.to_iso8601()
     |> Kernel.<>(" ")
   end
@@ -85,9 +85,17 @@ defmodule Logrex.Formatter do
   # format system metadata
   defp format_metadata(metadata, %{metadata_format: format} = config) do
     Enum.reduce(metadata, format, fn
-      {:module, v}, acc -> String.replace(acc, "$module", format_module(v, config))
+      {:module, v}, acc ->
+        String.replace(acc, "$module", format_module(v, config))
+
       {k, v}, acc ->
-        v = if String.Chars.impl_for(v), do: to_string(v), else: inspect(v)
+        v =
+          if !String.Chars.impl_for(v) or is_list(v) do
+            inspect(v)
+          else
+            to_string(v)
+          end
+
         String.replace(acc, "$#{k}", v)
     end)
   end
@@ -125,6 +133,7 @@ defmodule Logrex.Formatter do
 
   defp format_value(val, %{auto_inspect: false}) when inspect?(val), do: to_string(val)
   defp format_value(val, %{auto_inspect: false}), do: val
+
   defp format_value(val, _config) do
     if !String.Chars.impl_for(val) or is_list(val) do
       inspect(val, pretty: true)
