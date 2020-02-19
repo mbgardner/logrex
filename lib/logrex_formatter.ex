@@ -14,7 +14,10 @@ defmodule Logrex.Formatter do
     :registered_name,
     :domain,
     :crash_reason,
-    :gl
+    :gl,
+    :function,
+    :time,
+    :report_cb
   ]
 
   @default_padding 44
