@@ -92,7 +92,7 @@ defmodule LogrexTest do
       pstr = inspect(self())
 
       expected =
-        "foo=bar map=%{a: %{\"b\" => \"c\"}} b=c pid_id=#{pstr} pid_map=%{pid_id: #{pstr}} list=[1, 2, 3] tuple={1, 2} inline=val"
+        " b=c foo=bar inline=val list=[1, 2, 3] map=%{a: %{\"b\" => \"c\"}} pid_id=#{pstr} pid_map=%{pid_id: #{pstr}} tuple={1, 2}"
 
       assert capture_log(fun) |> rem_color =~ expected
     end
@@ -139,7 +139,7 @@ defmodule LogrexTest do
       foo = %{bar: 1}
       fun = fn -> Logrex.meta([foo, foo.bar, a: 1]) end
 
-      assert capture_log(fun) |> rem_color =~ "foo=%{bar: 1} bar=1 a=1"
+      assert capture_log(fun) |> rem_color =~ "a=1 bar=1 foo=%{bar: 1}"
     end
 
     test "logs a debug message by default" do
