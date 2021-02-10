@@ -31,10 +31,10 @@ defmodule Logrex.Formatter do
   }
 
   @level_names %{
-    debug: %{short: "DEBG", long: "DEBUG"},
-    info: %{short: "INFO", long: "INFO"},
-    warn: %{short: "WARN", long: "WARN"},
-    error: %{short: "EROR", long: "ERROR"}
+    debug: %{short: "DEBG", long: "DEBUG", single: "D"},
+    info: %{short: "INFO", long: "INFO", single: "I"},
+    warn: %{short: "WARN", long: "WARN", single: "W"},
+    error: %{short: "EROR", long: "ERROR", single: "E"}
   }
 
   @typep erl_datetime :: {{integer, integer, integer}, {integer, integer, integer, integer}}
@@ -144,8 +144,11 @@ defmodule Logrex.Formatter do
       to_string(val)
     end
   end
-
+  
   defp level_name(level, %{full_level_names: true}), do: @level_names[level].long
+  defp level_name(level, %{level_name: :full}), do: @level_names[level].long
+  defp level_name(level, %{level_name: :single}), do: @level_names[level].single
+  defp level_name(level, %{level_name: :default}), do: @level_names[level].short
   defp level_name(level, _config), do: @level_names[level].short
 
   defp get_colors do

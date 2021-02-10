@@ -179,6 +179,39 @@ defmodule LogrexFormatterTest do
     end
   end
 
+  describe "level_name config" do
+    test "displays full level names when :full" do
+      Application.put_env(:logrex, :level_names, :full)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "ERROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+
+    test "displays single letter level names when :single" do
+      Application.put_env(:logrex, :level_names, :single)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "E 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+
+    test "displays short level names when :default" do
+      Application.put_env(:logrex, :level_names, :default)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "EROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+
+    test "displays short level names when not set" do
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "EROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
+
+  end 
+
   describe "colors config" do
     test "includes colors when Logger colors are enabled" do
       Application.put_env(:logger, :colors, enabled: true)

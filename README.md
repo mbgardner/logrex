@@ -139,6 +139,9 @@ Config | Default | Description
 `padding` | 44 | the minimum character width of the main log message
 `pad_empty_messages` | false | the Logrex formatter will not apply padding to empty messages, unless set to 'true'
 `full_level_names` | false | display `DEBUG` and `ERROR` instead of their four-letter equivalents (DEBG, EROR)
+`level_names` | :full | display `DEBUG` and `ERROR` instead of their four-letter equivalents (DEBG, EROR)
+`level_names` | :single | display `D` and `E` instead of their four-letter equivalents (DEBG, EROR)
+`level_names` | :default | displays the default four-letter log levels. If this is not specified nor full_level_names, this is the default behaviour. 
 `show_elixir_prefix` | false | remove the `Elixir.` module prefix when displaying the module name
 `show_date` | false | includes the date in the log timestamp
 
