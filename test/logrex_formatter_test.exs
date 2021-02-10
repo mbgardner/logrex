@@ -162,43 +162,7 @@ defmodule LogrexFormatterTest do
     end
   end
 
-  describe "full_level_names config" do
-    test "displays full level names when true" do
-      Application.put_env(:logrex, :full_level_names, true)
-
-      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
-      expect = "ERROR 10:20:30"
-      assert result |> Enum.join("") |> rem_color =~ expect
-    end
-    test "displays full level names when true even if level_names is set" do
-      Application.put_env(:logrex, :level_names, :single)
-      Application.put_env(:logrex, :full_level_names, true)
-
-      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
-      expect = "ERROR 10:20:30"
-      assert result |> Enum.join("") |> rem_color =~ expect
-    end
-
-    test "displays short level names when not true" do
-      Application.put_env(:logrex, :full_level_names, false)
-
-      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
-      expect = "EROR 10:20:30"
-      assert result |> Enum.join("") |> rem_color =~ expect
-    end
-
-    test "displays short level names when not true, even if level_names is set" do
-      Application.put_env(:logrex, :level_names, :full)
-      Application.put_env(:logrex, :full_level_names, false)
-
-      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
-      expect = "EROR 10:20:30"
-      assert result |> Enum.join("") |> rem_color =~ expect
-
-    end
-  end
-
-  describe "level_name config" do
+  describe "level_names config" do
     test "displays full level names when :full" do
       Application.put_env(:logrex, :level_names, :full)
 
@@ -215,8 +179,8 @@ defmodule LogrexFormatterTest do
       assert result |> Enum.join("") |> rem_color =~ expect
     end
 
-    test "displays short level names when :default" do
-      Application.put_env(:logrex, :level_names, :default)
+    test "displays short level names when :short" do
+      Application.put_env(:logrex, :level_names, :short)
 
       result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
       expect = "EROR 10:20:30"
@@ -297,7 +261,7 @@ defmodule LogrexFormatterTest do
   describe "multiple config options" do
     test "don't intefere with each other" do
       Application.put_env(:logrex, :metadata_format, "pid:$pid")
-      Application.put_env(:logrex, :full_level_names, true)
+      Application.put_env(:logrex, :level_names, :full)
       Application.put_env(:logrex, :padding, 25)
 
       result =
