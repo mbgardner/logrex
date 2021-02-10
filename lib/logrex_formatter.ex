@@ -146,9 +146,10 @@ defmodule Logrex.Formatter do
   end
   
   defp level_name(level, %{full_level_names: true}), do: @level_names[level].long
-  defp level_name(level, %{level_name: :full}), do: @level_names[level].long
-  defp level_name(level, %{level_name: :single}), do: @level_names[level].single
-  defp level_name(level, %{level_name: :default}), do: @level_names[level].short
+  defp level_name(level, %{full_level_names: false}), do: @level_names[level].short
+  defp level_name(level, %{level_names: :full}), do: @level_names[level].long
+  defp level_name(level, %{level_names: :single}), do: @level_names[level].single
+  defp level_name(level, %{level_names: :default}), do: @level_names[level].short
   defp level_name(level, _config), do: @level_names[level].short
 
   defp get_colors do

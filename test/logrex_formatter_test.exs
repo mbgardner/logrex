@@ -11,6 +11,7 @@ defmodule LogrexFormatterTest do
       :padding,
       :pad_empty_messages,
       :full_level_names,
+      :level_names,
       :show_elixir_prefix,
       :show_date
     ]
@@ -169,6 +170,14 @@ defmodule LogrexFormatterTest do
       expect = "ERROR 10:20:30"
       assert result |> Enum.join("") |> rem_color =~ expect
     end
+    test "displays full level names when true even if level_names is set" do
+      Application.put_env(:logrex, :level_names, :single)
+      Application.put_env(:logrex, :full_level_names, true)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "ERROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+    end
 
     test "displays short level names when not true" do
       Application.put_env(:logrex, :full_level_names, false)
@@ -176,6 +185,16 @@ defmodule LogrexFormatterTest do
       result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
       expect = "EROR 10:20:30"
       assert result |> Enum.join("") |> rem_color =~ expect
+    end
+
+    test "displays short level names when not true, even if level_names is set" do
+      Application.put_env(:logrex, :level_names, :full)
+      Application.put_env(:logrex, :full_level_names, false)
+
+      result = Formatter.format(:error, "", {{1970, 1, 1}, {10, 20, 30, 500}}, a: 1)
+      expect = "EROR 10:20:30"
+      assert result |> Enum.join("") |> rem_color =~ expect
+
     end
   end
 
